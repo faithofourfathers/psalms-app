@@ -1,1 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psalms App</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        .highlight { background-color: yellow; transition: background 0.2s; }
+        #text-container { margin-top: 20px; font-size: 1.2rem; }
+        audio { width: 100%; position: sticky; top: 0; background: white; }
+    </style>
+</head>
+<body>
 
+    <h2>Psalm 1</h2>
+    <audio id="audio" controls src="psalm_1.mp3"></audio>
+    <div id="text-container"></div>
+
+    <script>
+        const audio = document.getElementById('audio');
+        const container = document.getElementById('text-container');
+
+        // Load your JSON data
+        fetch('psalm_1.json')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach((line, index) => {
+                    const span = document.createElement('span');
+                    span.id = `line-${index}`;
+                    span.innerText = line.text + " ";
+                    container.appendChild(span);
+                });
+
+                audio.ontimeupdate = () => {
+                    const currentTime = audio.currentTime;
+                    data.forEach((line, index) => {
+                        const el = document.getElementById(`line-${index}`);
+                        if (currentTime >= line.start && currentTime <= line.end) {
+                            el.className = 'highlight';
+                        } else {
+                            el.className = '';
+                        }
+                    });
+                };
+            });
+    </script>
+</body>
+</html>
