@@ -2,43 +2,45 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Psalms App</title>
+    <title>Psalms App</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
-        .highlight { background-color: yellow; transition: background 0.2s; }
-        #text-container { margin-top: 20px; font-size: 1.2rem; }
-        audio { width: 100%; position: sticky; top: 0; background: white; }
+        body { font-family: 'Georgia', serif; padding: 20px; line-height: 1.8; color: #333; max-width: 600px; margin: auto; }
+        audio { width: 100%; position: sticky; top: 10px; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 8px; }
+        .verse { padding: 8px; border-radius: 4px; margin-bottom: 10px; display: block; transition: all 0.3s; }
+        .highlight { background-color: #fff9c4; border-left: 4px solid #fbc02d; transform: translateX(5px); }
+        sup { color: #888; font-weight: bold; margin-right: 5px; }
+        h2 { text-align: center; color: #2c3e50; }
     </style>
 </head>
 <body>
 
     <h2>Psalm 1</h2>
     <audio id="audio" controls src="psalm_1.mp3"></audio>
-    <div id="text-container"></div>
+    <div id="text-container" style="margin-top:30px;"></div>
 
     <script>
         const audio = document.getElementById('audio');
         const container = document.getElementById('text-container');
 
-        // Load your JSON data
         fetch('psalm_1.json')
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
-                data.forEach((line, index) => {
-                    const span = document.createElement('span');
-                    span.id = `line-${index}`;
-                    span.innerText = line.text + " ";
-                    container.appendChild(span);
+                data.forEach((verse, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'verse';
+                    div.id = `v-${index}`;
+                    div.innerHTML = `<sup>${verse.number}</sup>${verse.text}`;
+                    container.appendChild(div);
                 });
 
                 audio.ontimeupdate = () => {
-                    const currentTime = audio.currentTime;
-                    data.forEach((line, index) => {
-                        const el = document.getElementById(`line-${index}`);
-                        if (currentTime >= line.start && currentTime <= line.end) {
-                            el.className = 'highlight';
+                    const time = audio.currentTime;
+                    data.forEach((verse, index) => {
+                        const el = document.getElementById(`v-${index}`);
+                        if (time >= verse.start && time < verse.end) {
+                            el.classList.add('highlight');
                         } else {
-                            el.className = '';
+                            el.classList.remove('highlight');
                         }
                     });
                 };
