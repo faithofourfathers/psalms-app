@@ -1,52 +1,38 @@
 [
   {
-    "start": 0.0,
-    "end": 5.44,
-    "text": "Blessed is the man who hath not walked in the counsel of the ungodly, nor stood in the"
+    "number": "1",
+    "text": "Blessed is the man who hath not walked in the counsel of the ungodly, nor stood in the way of sinners, nor sat in the chair of pestilence:",
+    "start": 15.4,
+    "end": 28.08
   },
   {
-    "start": 5.44,
-    "end": 10.36,
-    "text": "way of sinners, nor sat in the chair of pestilence."
+    "number": "2",
+    "text": "But his will is in the law of the Lord, and on his law he shall meditate day and night.",
+    "start": 28.08,
+    "end": 35.44
   },
   {
-    "start": 10.36,
-    "end": 17.68,
-    "text": "But his will is in the law of the Lord, and on his law he shall meditate day and night."
+    "number": "3",
+    "text": "And he shall be like a tree which is planted near the running waters, which shall bring forth its fruit, in due season. And his leaf shall not fall off: and all whatsoever he shall do shall prosper.",
+    "start": 35.44,
+    "end": 51.6
   },
   {
-    "start": 17.68,
-    "end": 23.4,
-    "text": "And he shall be like a tree which is planted near the running waters, which shall bring"
+    "number": "4",
+    "text": "Not so the wicked, not so: but like the dust, which the wind driveth from the face of the earth.",
+    "start": 51.6,
+    "end": 60.36
   },
   {
-    "start": 23.4,
-    "end": 26.88,
-    "text": "forth its fruit in due season."
+    "number": "5",
+    "text": "Therefore the wicked shall not rise again in judgment: nor sinners in the council of the just.",
+    "start": 60.36,
+    "end": 66.48
   },
   {
-    "start": 26.88,
-    "end": 33.84,
-    "text": "And his leaf shall not fall off, and all whatsoever he shall do shall prosper."
-  },
-  {
-    "start": 33.84,
-    "end": 41.44,
-    "text": "Not so the wicked, not so, but like the dust which the wind driveeth from the face of the"
-  },
-  {
-    "start": 41.44,
-    "end": 42.44,
-    "text": "earth."
-  },
-  {
-    "start": 42.44,
-    "end": 48.76,
-    "text": "Therefore the wicked shall not rise again in judgment, nor sinners in the counsel of the"
-  },
-  {
-    "start": 48.76,
-    "end": 57.08,
-    "text": "lust, for the Lord knoweth the way of the just, and the way of the wicked shall perish."
+    "number": "6",
+    "text": "For the Lord knoweth the way of the just: and the way of the wicked shall perish.",
+    "start": 66.48,
+    "end": 4205.16
   }
 ]
