@@ -5,27 +5,42 @@
     <title>Psalms App</title>
     <style>
         body { font-family: 'Georgia', serif; padding: 20px; line-height: 1.8; color: #333; max-width: 600px; margin: auto; }
-        audio { width: 100%; position: sticky; top: 10px; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 8px; }
+        audio { width: 100%; position: sticky; top: 10px; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 8px; background: white; }
+        
+        .header-section { text-align: center; margin-bottom: 30px; }
+        h2 { color: #2c3e50; margin-bottom: 5px; }
+        .subtitle { font-style: italic; font-size: 0.9rem; color: #666; display: block; line-height: 1.4; }
+        
         .verse { padding: 8px; border-radius: 4px; margin-bottom: 10px; display: block; transition: all 0.3s; }
         .highlight { background-color: #fff9c4; border-left: 4px solid #fbc02d; transform: translateX(5px); }
         sup { color: #888; font-weight: bold; margin-right: 5px; }
-        h2 { text-align: center; color: #2c3e50; }
     </style>
 </head>
 <body>
 
-    <h2>Psalm 1</h2>
-    <audio id="audio" controls src="psalm_1.mp3"></audio>
+    <div class="header-section">
+        <h2 id="psalm-title">Psalm 1</h2>
+        <span id="latin-title" class="subtitle"></span>
+        <span id="description" class="subtitle"></span>
+    </div>
+
+    <audio id="audio" controls src="Psalm1.mp3"></audio>
     <div id="text-container" style="margin-top:30px;"></div>
 
     <script>
         const audio = document.getElementById('audio');
         const container = document.getElementById('text-container');
 
-        fetch('psalm_1.json')
+        // Note: Change 'psalm_1.json' to 'Psalm1.json' to match your Audacity exports
+        fetch('Psalm1.json')
             .then(res => res.json())
             .then(data => {
-                data.forEach((verse, index) => {
+                // Set Header Info
+                document.getElementById('latin-title').innerText = data.latin_title;
+                document.getElementById('description').innerText = data.description;
+
+                // Render Verses
+                data.verses.forEach((verse, index) => {
                     const div = document.createElement('div');
                     div.className = 'verse';
                     div.id = `v-${index}`;
@@ -35,7 +50,7 @@
 
                 audio.ontimeupdate = () => {
                     const time = audio.currentTime;
-                    data.forEach((verse, index) => {
+                    data.verses.forEach((verse, index) => {
                         const el = document.getElementById(`v-${index}`);
                         if (time >= verse.start && time < verse.end) {
                             el.classList.add('highlight');
