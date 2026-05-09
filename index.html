@@ -1,19 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Psalms App</title>
     <style>
-        body { font-family: 'Georgia', serif; padding: 20px; line-height: 1.8; color: #333; max-width: 600px; margin: auto; }
-        audio { width: 100%; position: sticky; top: 10px; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 8px; background: white; }
+        body { 
+            font-family: 'Georgia', serif; 
+            padding: 20px; 
+            line-height: 1.8; 
+            color: #333; 
+            max-width: 600px; 
+            margin: auto; 
+            background-color: #fdfdfd;
+        }
         
-        .header-section { text-align: center; margin-bottom: 30px; }
-        h2 { color: #2c3e50; margin-bottom: 5px; }
-        .subtitle { font-style: italic; font-size: 0.9rem; color: #666; display: block; line-height: 1.4; }
+        .header-section { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            padding-top: 20px;
+        }
         
-        .verse { padding: 8px; border-radius: 4px; margin-bottom: 10px; display: block; transition: all 0.3s; }
-        .highlight { background-color: #fff9c4; border-left: 4px solid #fbc02d; transform: translateX(5px); }
-        sup { color: #888; font-weight: bold; margin-right: 5px; }
+        h2 { 
+            color: #2c3e50; 
+            margin-bottom: 5px; 
+            font-variant: small-caps;
+        }
+        
+        .subtitle { 
+            font-style: italic; 
+            font-size: 0.95rem; 
+            color: #666; 
+            display: block; 
+            line-height: 1.4; 
+            margin-top: 5px;
+        }
+
+        audio { 
+            width: 100%; 
+            position: sticky; 
+            top: 10px; 
+            z-index: 100; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            border-radius: 12px; 
+            background: #fff;
+        }
+        
+        #text-container {
+            margin-top: 40px;
+            padding-bottom: 100px;
+        }
+
+        .verse { 
+            padding: 10px 15px; 
+            border-radius: 6px; 
+            margin-bottom: 8px; 
+            display: block; 
+            transition: background 0.3s ease, transform 0.2s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .highlight { 
+            background-color: #fff9c4; 
+            border-left: 4px solid #fbc02d; 
+            transform: translateX(5px); 
+        }
+
+        sup { 
+            color: #999; 
+            font-weight: bold; 
+            margin-right: 8px; 
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
@@ -24,22 +82,33 @@
         <span id="description" class="subtitle"></span>
     </div>
 
-    <audio id="audio" controls src="Psalm1.mp3"></audio>
-    <div id="text-container" style="margin-top:30px;"></div>
+    <audio id="audio" controls></audio>
+    
+    <div id="text-container"></div>
 
     <script>
+        // 1. Determine which Psalm to load from URL (?p=X)
+        const urlParams = new URLSearchParams(window.location.search);
+        const pNum = urlParams.get('p') || '1';
+
         const audio = document.getElementById('audio');
         const container = document.getElementById('text-container');
+        const title = document.getElementById('psalm-title');
 
-        // Note: Change 'psalm_1.json' to 'Psalm1.json' to match your Audacity exports
-        fetch('Psalm1.json')
-            .then(res => res.json())
+        // 2. Set the correct file sources based on pNum
+        audio.src = `Psalm${pNum}.mp3`;
+        title.innerText = `Psalm ${pNum}`;
+
+        // 3. Fetch data and build the page
+        fetch(`Psalm${pNum}.json`)
+            .then(res => {
+                if (!res.ok) throw new Error('JSON file not found');
+                return res.json();
+            })
             .then(data => {
-                // Set Header Info
                 document.getElementById('latin-title').innerText = data.latin_title;
                 document.getElementById('description').innerText = data.description;
 
-                // Render Verses
                 data.verses.forEach((verse, index) => {
                     const div = document.createElement('div');
                     div.className = 'verse';
@@ -49,16 +118,23 @@
                 });
 
                 audio.ontimeupdate = () => {
-                    const time = audio.currentTime;
+                    // ADJUST OFFSET HERE: 
+                    // Negative (e.g. -0.4) makes highlight happen SOONER
+                    const OFFSET = -0.4; 
+                    const adjustedTime = audio.currentTime - OFFSET;
+
                     data.verses.forEach((verse, index) => {
                         const el = document.getElementById(`v-${index}`);
-                        if (time >= verse.start && time < verse.end) {
+                        if (adjustedTime >= verse.start && adjustedTime < verse.end) {
                             el.classList.add('highlight');
                         } else {
                             el.classList.remove('highlight');
                         }
                     });
                 };
+            })
+            .catch(err => {
+                container.innerHTML = `<p style="color:red; text-align:center;">Error loading Psalm ${pNum}. Ensure Psalm${pNum}.json exists.</p>`;
             });
     </script>
 </body>
