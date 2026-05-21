@@ -3,139 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Psalms App</title>
+    <title>Psalms of the Breviary</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Spectral:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
     <style>
-        body { 
-            font-family: 'Georgia', serif; 
-            padding: 20px; 
-            line-height: 1.8; 
-            color: #333; 
-            max-width: 600px; 
-            margin: auto; 
-            background-color: #fdfdfd;
-        }
+        :root { --gold: #fbc02d; --dark: #2c3e50; --bg: #fdfdfd; }
+        body { font-family: 'Spectral', serif; background: var(--bg); color: #333; margin: 0; padding: 0; }
         
-        .header-section { 
-            text-align: center; 
-            margin-bottom: 30px; 
-            padding-top: 20px;
-        }
-        
-        h2 { 
-            color: #2c3e50; 
-            margin-bottom: 5px; 
-            font-variant: small-caps;
-        }
-        
-        .subtitle { 
-            font-style: italic; 
-            font-size: 0.95rem; 
-            color: #666; 
-            display: block; 
-            line-height: 1.4; 
-            margin-top: 5px;
-        }
+        /* Typography */
+        h1, h2, h3 { font-family: 'Cinzel', serif; text-align: center; color: var(--dark); }
+        .subtitle { font-style: italic; font-size: 0.9rem; color: #666; display: block; text-align: center; }
 
-        audio { 
-            width: 100%; 
-            position: sticky; 
-            top: 10px; 
-            z-index: 100; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-            border-radius: 12px; 
-            background: #fff;
-        }
-        
-        #text-container {
-            margin-top: 40px;
-            padding-bottom: 100px;
-        }
+        /* Navigation Views */
+        .view { display: none; padding: 20px; max-width: 600px; margin: auto; animation: fadeIn 0.4s; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .verse { 
-            padding: 10px 15px; 
-            border-radius: 6px; 
-            margin-bottom: 8px; 
-            display: block; 
-            transition: background 0.3s ease, transform 0.2s ease;
-            border-left: 4px solid transparent;
+        /* Home Page Buttons */
+        .nav-card { 
+            background: white; border: 1px solid #ddd; padding: 30px; border-radius: 12px; 
+            margin-bottom: 20px; text-align: center; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
+        .nav-card:hover { border-color: var(--gold); transform: translateY(-3px); }
 
-        .highlight { 
-            background-color: #fff9c4; 
-            border-left: 4px solid #fbc02d; 
-            transform: translateX(5px); 
+        /* Grid for All Psalms */
+        .psalm-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 20px; }
+        .psalm-btn { 
+            padding: 10px; background: white; border: 1px solid #eee; border-radius: 6px; 
+            text-align: center; cursor: pointer; font-family: 'Cinzel';
         }
+        .psalm-btn:hover { background: var(--gold); color: white; }
 
-        sup { 
-            color: #999; 
-            font-weight: bold; 
-            margin-right: 8px; 
-            font-size: 0.8rem;
-        }
+        /* Player UI (Your existing style) */
+        audio { width: 100%; position: sticky; top: 10px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 12px; background: #fff; }
+        .verse { padding: 10px; border-radius: 6px; margin-bottom: 8px; transition: 0.3s; border-left: 4px solid transparent; }
+        .highlight { background-color: #fff9c4; border-left: 4px solid var(--gold); transform: translateX(5px); }
+        sup { color: #999; margin-right: 8px; font-weight: bold; }
+
+        /* Back Button */
+        .back-btn { cursor: pointer; color: var(--gold); font-weight: bold; margin-bottom: 20px; display: inline-block; }
     </style>
 </head>
 <body>
 
-    <div class="header-section">
-        <h2 id="psalm-title">Psalm 1</h2>
-        <span id="latin-title" class="subtitle"></span>
-        <span id="description" class="subtitle"></span>
+    <div id="view-home" class="view active">
+        <h1 style="margin-top: 100px; font-size: 2.5rem;">Psalms of the Breviary</h1>
+        <p style="text-align: center; margin-bottom: 50px;">Traditional Weekly Psalter of Pius X</p>
+        
+        <div class="nav-card" onclick="showView('view-days')">
+            <h3>Daily Breviary</h3>
+            <p>Pray the hours of the current day</p>
+        </div>
+        
+        <div class="nav-card" onclick="showView('view-all')">
+            <h3>All Psalms</h3>
+            <p>Direct access to the 150 Psalms</p>
+        </div>
     </div>
 
-    <audio id="audio" controls></audio>
-    
-    <div id="text-container"></div>
+    <div id="view-days" class="view">
+        <div class="back-btn" onclick="showView('view-home')">← Back</div>
+        <h2>Select Day</h2>
+        <div id="day-list"></div>
+    </div>
+
+    <div id="view-hours" class="view">
+        <div class="back-btn" onclick="showView('view-days')">← Back</div>
+        <h2 id="current-day-label">Monday</h2>
+        <div id="hour-list"></div>
+    </div>
+
+    <div id="view-psalms" class="view">
+        <div class="back-btn" onclick="showView('view-hours')">← Back</div>
+        <h2 id="current-hour-label">Matins</h2>
+        <div id="hour-psalm-list"></div>
+    </div>
+
+    <div id="view-all" class="view">
+        <div class="back-btn" onclick="showView('view-home')">← Back</div>
+        <h2>150 Psalms</h2>
+        <div class="psalm-grid" id="full-grid"></div>
+    </div>
+
+    <div id="view-player" class="view">
+        <div class="back-btn" onclick="goBackFromPlayer()">← Back</div>
+        <div class="header-section">
+            <h2 id="player-title">Psalm 1</h2>
+            <span id="latin-title" class="subtitle"></span>
+            <span id="description" class="subtitle"></span>
+        </div>
+        <audio id="audio" controls></audio>
+        <div id="text-container" style="margin-top: 30px;"></div>
+    </div>
+
+    <script src="psalter_schema.js"></script>
 
     <script>
-        // 1. Determine which Psalm to load from URL (?p=X)
-        const urlParams = new URLSearchParams(window.location.search);
-        const pNum = urlParams.get('p') || '1';
+        let currentPsalmData = [];
+        let previousView = 'view-home';
 
-        const audio = document.getElementById('audio');
-        const container = document.getElementById('text-container');
-        const title = document.getElementById('psalm-title');
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            if (viewId !== 'view-player') previousView = viewId;
+            window.scrollTo(0,0);
+        }
 
-        // 2. Set the correct file sources based on pNum
-        audio.src = `Psalm${pNum}.mp3`;
-        title.innerText = `Psalm ${pNum}`;
+        // Initialize Days
+        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const dayList = document.getElementById('day-list');
+        days.forEach(day => {
+            const div = document.createElement('div');
+            div.className = 'nav-card';
+            div.innerHTML = `<h3>${day}</h3>`;
+            div.onclick = () => {
+                document.getElementById('current-day-label').innerText = day;
+                loadHours(day);
+                showView('view-hours');
+            };
+            dayList.appendChild(div);
+        });
 
-        // 3. Fetch data and build the page
-        fetch(`Psalm${pNum}.json`)
-            .then(res => {
-                if (!res.ok) throw new Error('JSON file not found');
-                return res.json();
-            })
-            .then(data => {
-                document.getElementById('latin-title').innerText = data.latin_title;
-                document.getElementById('description').innerText = data.description;
+        // Initialize 150 Grid
+        const grid = document.getElementById('full-grid');
+        for (let i = 1; i <= 150; i++) {
+            const btn = document.createElement('div');
+            btn.className = 'psalm-btn';
+            btn.innerText = i;
+            btn.onclick = () => loadPsalm(i);
+            grid.appendChild(btn);
+        }
 
-                data.verses.forEach((verse, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'verse';
-                    div.id = `v-${index}`;
-                    div.innerHTML = `<sup>${verse.number}</sup>${verse.text}`;
-                    container.appendChild(div);
-                });
+        function loadHours(day) {
+            const hourList = document.getElementById('hour-list');
+            hourList.innerHTML = '';
+            const hours = ["Matins", "Lauds", "Prime", "Terce", "Sext", "None", "Vespers", "Compline"];
+            hours.forEach(hour => {
+                const div = document.createElement('div');
+                div.className = 'nav-card';
+                div.innerHTML = `<h3>${hour}</h3>`;
+                div.onclick = () => {
+                    document.getElementById('current-hour-label').innerText = `${day} ${hour}`;
+                    loadPsalmsForHour(day, hour);
+                    showView('view-psalms');
+                };
+                hourList.appendChild(div);
+            });
+        }
 
-                audio.ontimeupdate = () => {
-                    // ADJUST OFFSET HERE: 
-                    // Negative (e.g. -0.4) makes highlight happen SOONER
-                    const OFFSET = -0.4; 
-                    const adjustedTime = audio.currentTime - OFFSET;
+        function loadPsalmsForHour(day, hour) {
+            const list = document.getElementById('hour-psalm-list');
+            list.innerHTML = '';
+            const psalms = PSALTER_SCHEMA[day][hour] || [];
+            psalms.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'nav-card';
+                div.innerHTML = `<h3>Psalm ${p.id} ${p.start ? '(Part ' + p.start + ')' : ''}</h3>`;
+                div.onclick = () => loadPsalm(p.id, p.start || 1);
+                list.appendChild(div);
+            });
+        }
+
+        function loadPsalm(id, startVerseNum = 1) {
+            const audio = document.getElementById('audio');
+            const container = document.getElementById('text-container');
+            const title = document.getElementById('player-title');
+            
+            container.innerHTML = 'Loading...';
+            audio.src = `Psalm${id}.mp3`;
+            title.innerText = `Psalm ${id}`;
+            showView('view-player');
+
+            fetch(`Psalm${id}.json`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('latin-title').innerText = data.latin_title;
+                    document.getElementById('description').innerText = data.description;
+                    container.innerHTML = '';
+                    currentPsalmData = data.verses;
 
                     data.verses.forEach((verse, index) => {
-                        const el = document.getElementById(`v-${index}`);
-                        if (adjustedTime >= verse.start && adjustedTime < verse.end) {
-                            el.classList.add('highlight');
-                        } else {
-                            el.classList.remove('highlight');
-                        }
+                        const div = document.createElement('div');
+                        div.className = 'verse';
+                        div.id = `v-${index}`;
+                        div.innerHTML = `<sup>${verse.number}</sup>${verse.text}`;
+                        container.appendChild(div);
                     });
-                };
-            })
-            .catch(err => {
-                container.innerHTML = `<p style="color:red; text-align:center;">Error loading Psalm ${pNum}. Ensure Psalm${pNum}.json exists.</p>`;
-            });
+
+                    // JUMP LOGIC: Find the start time of the requested verse
+                    const startVerse = data.verses.find(v => parseInt(v.number) === startVerseNum);
+                    if (startVerse) {
+                        audio.currentTime = startVerse.start;
+                    }
+
+                    audio.ontimeupdate = () => {
+                        const OFFSET = -0.4;
+                        const time = audio.currentTime - OFFSET;
+                        currentPsalmData.forEach((verse, index) => {
+                            const el = document.getElementById(`v-${index}`);
+                            if (time >= verse.start && time < verse.end) {
+                                el.classList.add('highlight');
+                            } else {
+                                el.classList.remove('highlight');
+                            }
+                        });
+                    };
+                });
+        }
+
+        function goBackFromPlayer() {
+            document.getElementById('audio').pause();
+            showView(previousView);
+        }
     </script>
 </body>
 </html>
